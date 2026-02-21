@@ -1,24 +1,22 @@
 import { Link, useLocation } from 'react-router-dom';
-import {
-    LayoutDashboard,
-    Package,
-    Briefcase,
-    Users,
-    Settings,
-    LogOut,
-    ExternalLink
-} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const AdminSidebar = () => {
     const location = useLocation();
-    const isActive = (path) => location.pathname === path;
+    const isActive = (path) => location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path));
 
     const navItems = [
-        { name: 'Overview', path: '/admin', icon: LayoutDashboard },
-        { name: 'Services', path: '/admin/services', icon: Package },
-        { name: 'Hiring Desk', path: '/admin/hiring', icon: Briefcase },
-        { name: 'Applications', path: '/admin/applications', icon: Users },
+        { name: 'Overview', path: '/admin', icon: 'dashboard' },
+        { name: 'Services', path: '/admin/services', icon: 'layers' },
+        { name: 'Hiring Desk', path: '/admin/hiring', icon: 'badge' },
+        { name: 'Students', path: '/admin/students', icon: 'school' },
+        { name: 'Applications', path: '/admin/applications', icon: 'mail' },
+    ];
+
+    const systemItems = [
+        { name: 'Audit Logs', path: '/admin/audit-logs', icon: 'history' },
+        { name: 'Settings', path: '/admin/settings', icon: 'settings' },
+        { name: 'Help Center', path: '#', icon: 'help' }
     ];
 
     const handleLogout = async () => {
@@ -28,131 +26,65 @@ const AdminSidebar = () => {
     };
 
     return (
-        <aside className="admin-sidebar">
-            <div className="sidebar-logo">
-                <span className="logo-jiv">Jiv</span>
-                <span className="logo-it">IT</span>
-                <span className="logo-suffix">Admin</span>
+        <aside className="w-64 bg-sidebar-dark text-slate-300 flex flex-col fixed h-full z-50">
+            <div className="p-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg">
+                    <span className="material-symbols-outlined">rocket_launch</span>
+                </div>
+                <div className="flex flex-col">
+                    <h1 className="text-white text-lg font-bold leading-tight">Command Center</h1>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">JivIT Solutions</p>
+                </div>
             </div>
 
-            <nav className="sidebar-nav">
-                <div className="nav-section">
-                    <p className="section-label">Management</p>
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
-                        >
-                            <item.icon size={20} />
-                            <span>{item.name}</span>
-                        </Link>
-                    ))}
-                </div>
-
-                <div className="nav-section">
-                    <p className="section-label">Preferences</p>
-                    <Link to="/admin/settings" className={`nav-link ${isActive('/admin/settings') ? 'active' : ''}`}>
-                        <Settings size={20} />
-                        <span>Settings</span>
+            <nav className="flex-1 px-4 mt-4 space-y-1">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive(item.path)
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'hover:bg-white/5'
+                            }`}
+                    >
+                        <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
+                        <span className="text-sm font-medium">{item.name}</span>
                     </Link>
-                </div>
+                ))}
+
+                <div className="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">System</div>
+
+                {systemItems.map((item) => (
+                    <Link
+                        key={item.name}
+                        to={item.path}
+                        className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive(item.path)
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'hover:bg-white/5'
+                            }`}
+                    >
+                        <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
+                        <span className="text-sm font-medium">{item.name}</span>
+                    </Link>
+                ))}
             </nav>
 
-            <div className="sidebar-footer">
-                <Link to="/" target="_blank" className="nav-link external">
-                    <ExternalLink size={18} />
-                    <span>View Website</span>
-                </Link>
-                <button onClick={handleLogout} className="nav-link logout-btn">
-                    <LogOut size={20} />
-                    <span>Sign Out</span>
-                </button>
+            <div className="p-4 border-t border-slate-800">
+                <div className="flex items-center gap-3 p-2 bg-slate-900 rounded-xl group cursor-pointer hover:bg-slate-800 transition-colors" onClick={handleLogout} title="Click to Logout">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-700 text-slate-300 group-hover:bg-red-500/20 group-hover:text-red-500 transition-colors overflow-hidden">
+                        <span className="material-symbols-outlined text-sm">logout</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-white truncate">Sign Out</p>
+                        <p className="text-[10px] text-slate-500 truncate">Administrator</p>
+                    </div>
+                </div>
             </div>
 
             <style>{`
-                .admin-sidebar {
-                    width: 260px;
-                    height: 100vh;
-                    background: #111827;
-                    color: white;
-                    display: flex;
-                    flex-direction: column;
-                    position: sticky;
-                    top: 0;
-                    border-right: 1px solid #1f2937;
-                }
-                .sidebar-logo {
-                    padding: 2rem 1.5rem;
-                    font-size: 1.5rem;
-                    font-weight: 700;
-                    border-bottom: 1px solid #1f2937;
-                    margin-bottom: 1rem;
-                }
-                .logo-jiv { color: white; }
-                .logo-it { color: #6366f1; }
-                .logo-suffix { 
-                    font-size: 0.8rem; 
-                    background: #374151; 
-                    padding: 0.2rem 0.5rem; 
-                    border-radius: 4px; 
-                    margin-left: 0.5rem;
-                    font-weight: 500;
-                }
-                .sidebar-nav {
-                    flex: 1;
-                    padding: 0 1rem;
-                }
-                .nav-section {
-                    margin-bottom: 2rem;
-                }
-                .section-label {
-                    color: #9ca3af;
-                    font-size: 0.75rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    margin-bottom: 0.75rem;
-                    padding-left: 0.75rem;
-                }
-                .nav-link {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                    padding: 0.75rem 1rem;
-                    color: #d1d5db;
-                    text-decoration: none;
-                    border-radius: 8px;
-                    transition: all 0.2s;
-                    font-size: 0.95rem;
-                }
-                .nav-link:hover {
-                    background: #1f2937;
-                    color: white;
-                }
-                .nav-link.active {
-                    background: #6366f1;
-                    color: white;
-                    font-weight: 500;
-                }
-                .sidebar-footer {
-                    padding: 1rem;
-                    border-top: 1px solid #1f2937;
-                }
-                .logout-btn {
-                    width: 100%;
-                    background: transparent;
-                    border: none;
-                    cursor: pointer;
-                    margin-top: 0.5rem;
-                    text-align: left;
-                }
-                .logout-btn:hover {
-                    color: #ef4444;
-                }
-                .nav-link.external {
-                    color: #9ca3af;
-                    font-size: 0.875rem;
-                }
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            }
             `}</style>
         </aside>
     );

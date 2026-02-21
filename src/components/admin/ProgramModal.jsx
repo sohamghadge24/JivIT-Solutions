@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
 
-const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
+const ProgramModal = ({ isOpen, onClose, onSave, program = null }) => {
     const [formData, setFormData] = useState({
         title: '',
-        department: 'IT Division',
+        category: "career", subtitle: "", image_url: "", department: "IT Division",
         location: 'Remote',
         type: 'Full-time',
         description: '',
@@ -14,15 +14,15 @@ const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (job) {
+        if (program) {
             setFormData({
-                ...job,
-                requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : ''
+                ...program,
+                subtitle: program.subtitle || "", category: program.category || "career", image_url: program.image_url || "", requirements: Array.isArray(program.requirements) ? program.requirements.join('\n') : ''
             });
         } else {
             setFormData({
                 title: '',
-                department: 'IT Division',
+                category: "career", subtitle: "", image_url: "", department: "IT Division",
                 location: 'Remote',
                 type: 'Full-time',
                 description: '',
@@ -30,7 +30,7 @@ const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
                 status: 'draft'
             });
         }
-    }, [job, isOpen]);
+    }, [program, isOpen]);
 
     if (!isOpen) return null;
 
@@ -58,7 +58,7 @@ const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
             <div className="bg-white dark:bg-slate-900 w-full max-w-[650px] max-h-[90vh] rounded-2xl shadow-2xl overflow-y-auto border border-slate-200 dark:border-slate-800 animate-[modalSlideUp_0.3s_ease-out]">
                 <div className="px-8 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
                     <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                        {job ? 'Edit Job Posting' : 'Post New Job'}
+                        {job ? 'Edit Program' : 'Create Program'}
                     </h2>
                     <button
                         onClick={onClose}
@@ -71,7 +71,7 @@ const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
                 <form onSubmit={handleSubmit} className="p-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Job Title</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Program Title</label>
                             <input
                                 type="text"
                                 required
@@ -97,7 +97,7 @@ const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Job Type</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Program Category</label>
                             <select
                                 value={formData.type}
                                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -185,4 +185,4 @@ const JobModal = ({ isOpen, onClose, onSave, job = null }) => {
     );
 };
 
-export default JobModal;
+export default ProgramModal;

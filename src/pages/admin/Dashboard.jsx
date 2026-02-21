@@ -1,24 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../lib/adminService';
 import { useAdmin } from '../../hooks/useAdmin';
-import {
-    LayoutDashboard,
-    Briefcase,
-    GraduationCap,
-    Package,
-    Users,
-    Activity,
-    Plus,
-    ChevronRight,
-    Search,
-    AlertCircle,
-    CheckCircle2,
-    Clock,
-    TrendingUp,
-    Database,
-    Zap,
-    RefreshCw
-} from 'lucide-react';
 
 const Dashboard = () => {
     const { profile } = useAdmin();
@@ -37,7 +19,6 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // Fetch individually to prevent one failure from blocking everything
                 const servicesData = await adminService.getServices(true).catch(() => []);
                 const jobsData = await adminService.getJobOpenings(true).catch(() => []);
                 const applicationsData = await adminService.getApplications().catch(() => []);
@@ -64,328 +45,199 @@ const Dashboard = () => {
         fetchStats();
     }, []);
 
-    const biCards = [
-        {
-            title: 'Business Offerings',
-            main: stats.services,
-            sub: `${stats.published_services} Live`,
-            icon: Package,
-            color: '#4A5D73',
-            trend: '+12%',
-            link: '/admin/services'
-        },
-        {
-            title: 'Hiring Pipeline',
-            main: stats.jobs,
-            sub: `${stats.published_jobs} Open Roles`,
-            icon: Briefcase,
-            color: '#4A5D73',
-            trend: 'Active',
-            link: '/admin/hiring'
-        },
-        {
-            title: 'Talent Intake',
-            main: stats.applications,
-            sub: `${stats.new_applications} Unread`,
-            icon: Users,
-            color: '#4A5D73',
-            trend: 'New',
-            link: '/admin/applications'
-        },
-    ];
-
     if (loading) return (
-        <div className="admin-dashboard-loading">
-            <RefreshCw className="animate-spin" size={32} />
-            <p>Initiating Command Center...</p>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate-500">
+            <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-primary">refresh</span>
+            <p className="font-medium animate-pulse">Initiating Command Center...</p>
         </div>
     );
 
-    return (
-        <div className="command-center">
-            {/* Top Bar / Header */}
-            <header className="cc-header">
-                <div className="header-greeting">
-                    <p className="cc-breadcrumb">Management Dashboard / Overview</p>
-                    <h1>Command Center</h1>
-                    <p className="cc-welcome">Welcome back, {profile?.full_name?.split(' ')[0] || 'Admin'}. System performance is optimal.</p>
-                </div>
+    const userName = profile?.full_name?.split(' ')[0] || 'Admin';
 
-                <div className="cc-system-health">
-                    <div className={`health-badge ${stats.system_status}`}>
-                        <Database size={14} />
-                        <span>Supabase {stats.system_status}</span>
+    return (
+        <>
+            <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-40">
+                <div className="flex flex-col">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Welcome back, {userName}</h2>
+                    <p className="text-xs text-slate-500 font-medium">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                </div>
+                <div className="flex items-center gap-6">
+                    {/* Status Indicator */}
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${stats.system_status === 'operational' ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/30'}`}>
+                        <span className="relative flex h-2 w-2">
+                            {stats.system_status === 'operational' && (
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            )}
+                            <span className={`relative inline-flex rounded-full h-2 w-2 ${stats.system_status === 'operational' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                        </span>
+                        <span className={`text-xs font-bold ${stats.system_status === 'operational' ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>Supabase {stats.system_status}</span>
                     </div>
-                    <div className="cc-current-time">
-                        <Clock size={14} />
-                        <span>{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => window.location.href = '/admin/services'} className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 transition-colors" title="Search Services">
+                            <span className="material-symbols-outlined">search</span>
+                        </button>
+                        <button onClick={() => window.location.href = '/admin/applications'} className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 transition-colors relative" title="View Applications">
+                            <span className="material-symbols-outlined">notifications</span>
+                            {(stats.new_applications > 0) && (
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                            )}
+                        </button>
                     </div>
                 </div>
             </header>
 
-            {/* High-Level BI Grid */}
-            <section className="cc-bi-grid">
-                {biCards.map((card, idx) => (
-                    <div key={idx} className="bi-card" onClick={() => window.location.href = card.link}>
-                        <div className="bi-top">
-                            <div className="bi-icon" style={{ backgroundColor: `${card.color}10` }}>
-                                <card.icon size={22} color={card.color} />
+            <div className="p-8 flex-1 grid grid-cols-12 gap-8 overflow-y-auto">
+                {/* Main Workspace (8 columns) */}
+                <div className="col-span-12 lg:col-span-8 space-y-8">
+                    {/* Metrics Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/admin/services'}>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                    <span className="material-symbols-outlined">inventory_2</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full uppercase">Operational</span>
                             </div>
-                            <span className="bi-trend">{card.trend}</span>
+                            <h3 className="text-sm font-medium text-slate-500">Business Offerings</h3>
+                            <p className="text-2xl font-bold mt-1">{stats.services} Live Services</p>
                         </div>
-                        <div className="bi-content">
-                            <p className="bi-label">{card.title}</p>
-                            <h2 className="bi-value">{card.main}</h2>
-                            <p className="bi-sub">{card.sub}</p>
+
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/admin/hiring'}>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                                    <span className="material-symbols-outlined">group_add</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-full uppercase">Active Pipeline</span>
+                            </div>
+                            <h3 className="text-sm font-medium text-slate-500">Hiring Pipeline</h3>
+                            <p className="text-2xl font-bold mt-1">{stats.jobs} Open Roles</p>
                         </div>
-                        <div className="bi-action">
-                            <span>Manage</span>
-                            <ChevronRight size={14} />
+
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/admin/applications'}>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-10 h-10 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                                    <span className="material-symbols-outlined">inbox</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full uppercase">Updated Just Now</span>
+                            </div>
+                            <h3 className="text-sm font-medium text-slate-500">Talent Intake</h3>
+                            <p className="text-2xl font-bold mt-1">{stats.new_applications} Unread Apps</p>
                         </div>
                     </div>
-                ))}
-            </section>
 
-            <div className="cc-main-grid">
-                {/* Productive Workflow Section */}
-                <div className="cc-column left">
-                    <section className="cc-workflow-card">
-                        <div className="card-header-cc">
-                            <div className="header-title">
-                                <Zap size={18} className="text-accent" />
-                                <h2>Quick Workflow</h2>
-                            </div>
+                    {/* Quick Workflow Section */}
+                    <section>
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-bold">Quick Workflow</h3>
+                            <button className="text-sm font-semibold text-primary hover:underline" onClick={() => window.location.href = '/admin/services'}>View All Actions</button>
                         </div>
-                        <div className="workflow-buttons">
-                            <button onClick={() => window.location.href = '/admin/services'} className="workflow-item">
-                                <div className="wf-icon"><Plus size={18} /></div>
-                                <div className="wf-text">
-                                    <p>New Service</p>
-                                    <span>Expand business portfolio</span>
-                                </div>
-                            </button>
-                            <button onClick={() => window.location.href = '/admin/hiring'} className="workflow-item">
-                                <div className="wf-icon"><Briefcase size={18} /></div>
-                                <div className="wf-text">
-                                    <p>Post Job</p>
-                                    <span>Grow your specialized team</span>
-                                </div>
-                            </button>
-                            <button onClick={() => window.location.href = '/admin/applications'} className="workflow-item">
-                                <div className="wf-icon"><Users size={18} /></div>
-                                <div className="wf-text">
-                                    <p>Talent Review</p>
-                                    <span>{stats.new_applications} pending reviews</span>
-                                </div>
-                            </button>
-                        </div>
-                    </section>
-
-                    <section className="cc-pipeline-card">
-                        <div className="card-header-cc">
-                            <div className="header-title">
-                                <TrendingUp size={18} className="text-accent" />
-                                <h2>Business Health</h2>
-                            </div>
-                        </div>
-                        <div className="health-metrics">
-                            <div className="metric-row">
-                                <span>Platform Enablement</span>
-                                <div className="progress-bar-container">
-                                    <div className="progress-fill" style={{ width: '75%' }}></div>
-                                </div>
-                                <span className="metric-pct">75%</span>
-                            </div>
-                            <div className="metric-row">
-                                <span>IT Solutions Reach</span>
-                                <div className="progress-bar-container">
-                                    <div className="progress-fill" style={{ width: '92%' }}></div>
-                                </div>
-                                <span className="metric-pct">92%</span>
-                            </div>
-                            <div className="metric-row">
-                                <span>Wellness Healing</span>
-                                <div className="progress-bar-container">
-                                    <div className="progress-fill" style={{ width: '45%' }}></div>
-                                </div>
-                                <span className="metric-pct">45%</span>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                {/* Activity and Intelligence Section */}
-                <div className="cc-column right">
-                    <section className="cc-activity-card">
-                        <div className="card-header-cc">
-                            <div className="header-title">
-                                <Activity size={18} className="text-accent" />
-                                <h2>Audit Trail</h2>
-                            </div>
-                            <button className="btn-text-only">View All</button>
-                        </div>
-                        <div className="activity-feed-cc">
-                            {stats.recentLogs.map((log) => (
-                                <div key={log.id} className="activity-row-cc">
-                                    <div className={`activity-bullet ${log.action.toLowerCase()}`}></div>
-                                    <div className="activity-info-cc">
-                                        <p><strong>{log.action}</strong> {log.entity_type.replace('_', ' ')}</p>
-                                        <div className="activity-meta-cc">
-                                            <span>{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            <span className="dot"></span>
-                                            <span>{new Date(log.created_at).toLocaleDateString()}</span>
-                                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Action Card 1 */}
+                            <div className="group relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+                                <div className="relative flex flex-col h-full">
+                                    <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-white mb-6 shadow-lg">
+                                        <span className="material-symbols-outlined text-3xl">add_business</span>
                                     </div>
-                                    {log.action === 'CREATE' && <Plus size={14} className="text-muted" />}
+                                    <h4 className="text-xl font-bold mb-2">New Service</h4>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">Launch a new enterprise offering or digital product module to the marketplace.</p>
+                                    <button onClick={() => window.location.href = '/admin/services'} className="mt-auto w-fit flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                                        <span>Create Now</span>
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </button>
                                 </div>
-                            ))}
-                            {stats.recentLogs.length === 0 && (
-                                <div className="empty-activity">
-                                    <p>System log is currently quiet.</p>
+                            </div>
+
+                            {/* Action Card 2 */}
+                            <div className="group relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+                                <div className="relative flex flex-col h-full">
+                                    <div className="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white mb-6 shadow-lg">
+                                        <span className="material-symbols-outlined text-3xl">work</span>
+                                    </div>
+                                    <h4 className="text-xl font-bold mb-2">Post Job</h4>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">Broadcast a new vacancy to our partner networks and recruitment portals.</p>
+                                    <button onClick={() => window.location.href = '/admin/hiring'} className="mt-auto w-fit flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors shadow-lg">
+                                        <span>Post Now</span>
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </button>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </section>
                 </div>
+
+                {/* Activity / Audit Trail Sidebar (4 columns) */}
+                <aside className="col-span-12 lg:col-span-4 space-y-6">
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm sticky top-28">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-bold">Audit Trail</h3>
+                            <button onClick={() => window.location.href = '/admin/audit-logs'} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="View Logs List">
+                                <span className="material-symbols-outlined text-slate-500 text-lg">filter_list</span>
+                            </button>
+                        </div>
+                        <div className="space-y-8 relative">
+                            {/* Vertical line */}
+                            <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-slate-100 dark:bg-slate-800"></div>
+
+                            {/* Activity Items */}
+                            {stats.recentLogs.slice(0, 4).map((log, index) => {
+                                const getIconAndColors = (action) => {
+                                    switch (action.toLowerCase()) {
+                                        case 'create': return { icon: 'add_circle', bg: 'bg-green-50 dark:bg-green-900/30', border: 'border-white dark:border-slate-900', text: 'text-green-600' };
+                                        case 'update': return { icon: 'edit', bg: 'bg-blue-50 dark:bg-blue-900/30', border: 'border-white dark:border-slate-900', text: 'text-blue-600' };
+                                        case 'delete': return { icon: 'delete', bg: 'bg-red-50 dark:bg-red-900/30', border: 'border-white dark:border-slate-900', text: 'text-red-600' };
+                                        default: return { icon: 'sync', bg: 'bg-amber-50 dark:bg-amber-900/30', border: 'border-white dark:border-slate-900', text: 'text-amber-600' };
+                                    }
+                                };
+                                const style = getIconAndColors(log.action);
+
+                                return (
+                                    <div key={log.id || index} className="relative pl-10">
+                                        <div className={`absolute left-0 w-8 h-8 rounded-full ${style.bg} flex items-center justify-center border-2 ${style.border} shadow-sm z-10`}>
+                                            <span className={`material-symbols-outlined ${style.text} text-base`}>{style.icon}</span>
+                                        </div>
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white">{log.action} {log.entity_type}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">{userName} performed {log.action} on {log.entity_type}.</p>
+                                        <p className="text-[10px] text-slate-400 font-medium mt-1">{new Date(log.created_at).toLocaleString()}</p>
+                                    </div>
+                                );
+                            })}
+
+                            {!stats.recentLogs.length && (
+                                <p className="text-sm text-slate-500 pl-10">No recent activity.</p>
+                            )}
+
+                            <div className="relative pl-10 text-center">
+                                <button onClick={() => window.location.href = '/admin/audit-logs'} className="text-xs font-bold text-primary hover:underline">View Older Activity</button>
+                            </div>
+                        </div>
+
+                        {/* System Health Summary Card */}
+                        <div className="mt-10 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Infrastructure</h4>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="text-slate-600 dark:text-slate-400">Database</span>
+                                    <span className="font-bold text-green-500">99.9%</span>
+                                </div>
+                                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div className="h-full bg-green-500 w-[99.9%]"></div>
+                                </div>
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="text-slate-600 dark:text-slate-400">API Gateway</span>
+                                    <span className="font-bold text-primary">98.4%</span>
+                                </div>
+                                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div className="h-full bg-primary w-[98.4%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
-
-            <style>{`
-                .command-center {
-                    padding: 2.5rem;
-                    background: #F6F4EF; /* Premium Warm Cream */
-                    min-height: 100vh;
-                    color: #2B2B2B; /* Deep Charcoal Heading */
-                }
-
-                /* Header Styling */
-                .cc-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-end;
-                    margin-bottom: 2.5rem;
-                }
-                .cc-breadcrumb { font-size: 0.75rem; color: #787878; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
-                .cc-header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
-                .cc-welcome { color: #5A5A5A; font-size: 1rem; }
-                
-                .cc-system-health { display: flex; gap: 1rem; align-items: center; }
-                .health-badge {
-                    display: flex; align-items: center; gap: 0.5rem;
-                    padding: 0.5rem 1rem; border-radius: 99px;
-                    font-size: 0.8rem; font-weight: 600;
-                }
-                .health-badge.operational { background: #E1E8E1; color: #2D5A27; }
-                .health-badge.degraded { background: #fee2e2; color: #b91c1c; }
-                .cc-current-time {
-                    display: flex; align-items: center; gap: 0.5rem;
-                    color: #787878; font-size: 0.8rem; font-weight: 500;
-                }
-
-                /* BI Cards Grid */
-                .cc-bi-grid {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 1.5rem;
-                    margin-bottom: 2.5rem;
-                }
-                .bi-card {
-                    background: #E6DDD3; /* Warm Sand */
-                    padding: 1.75rem;
-                    border-radius: 20px;
-                    border: 1px solid #D2C7BB;
-                    cursor: pointer;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    position: relative;
-                    overflow: hidden;
-                }
-                .bi-card:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 12px 24px -8px rgba(43,43,43,0.1);
-                    border-color: #4A5D73;
-                }
-                .bi-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-                .bi-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-                .bi-trend { font-size: 0.7rem; font-weight: 700; color: #4A5D73; background: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; }
-                .bi-label { font-size: 0.85rem; font-weight: 600; color: #5A5A5A; margin-bottom: 0.5rem; }
-                .bi-value { font-size: 2rem; font-weight: 800; margin-bottom: 0.25rem; }
-                .bi-sub { font-size: 0.8rem; color: #787878; }
-                .bi-action {
-                    margin-top: 1.5rem; display: flex; align-items: center; gap: 0.25rem;
-                    font-size: 0.75rem; font-weight: 700; color: #4A5D73;
-                    opacity: 0; transform: translateX(-10px); transition: all 0.3s;
-                }
-                .bi-card:hover .bi-action { opacity: 1; transform: translateX(0); }
-
-                /* Main Grid Columns */
-                .cc-main-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; }
-                .cc-column { display: flex; flex-direction: column; gap: 2rem; }
-
-                /* Card Commons */
-                .cc-workflow-card, .cc-pipeline-card, .cc-activity-card {
-                    background: white; border-radius: 24px; border: 1px solid #D2C7BB; padding: 2rem;
-                    box-shadow: 0 1px 3px rgba(43,43,43,0.05);
-                }
-                .card-header-cc { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-                .header-title { display: flex; align-items: center; gap: 0.75rem; }
-                .header-title h2 { font-size: 1.1rem; font-weight: 700; }
-                .text-accent { color: #4A5D73; }
-
-                /* Workflow Items */
-                .workflow-buttons { display: flex; flex-direction: column; gap: 1rem; }
-                .workflow-item {
-                    display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem;
-                    border: 1px solid #E6DDD3; border-radius: 16px; background: #fff;
-                    cursor: pointer; transition: all 0.2s; width: 100%; text-align: left;
-                }
-                .workflow-item:hover { background: #F6F4EF; border-color: #4A5D73; transform: scale(1.01); }
-                .wf-icon { 
-                    width: 40px; height: 40px; border-radius: 10px; background: #4A5D73; color: #fff;
-                    display: flex; align-items: center; justify-content: center;
-                }
-                .wf-text p { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.1rem; }
-                .wf-text span { font-size: 0.8rem; color: #787878; }
-
-                /* Pipeline / Progress */
-                .health-metrics { display: flex; flex-direction: column; gap: 1.5rem; }
-                .metric-row { display: grid; grid-template-columns: 140px 1fr 40px; align-items: center; gap: 1.5rem; }
-                .metric-row span { font-size: 0.85rem; font-weight: 600; color: #5A5A5A; }
-                .progress-bar-container { height: 8px; background: #E6DDD3; border-radius: 4px; overflow: hidden; }
-                .progress-fill { height: 100%; background: #4A5D73; border-radius: 4px; }
-                .metric-pct { font-weight: 700; color: #2B2B2B; text-align: right; }
-
-                /* Activity Feed */
-                .activity-feed-cc { display: flex; flex-direction: column; gap: 1.5rem; }
-                .activity-row-cc { display: flex; align-items: center; gap: 1.25rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f1f5f9; }
-                .activity-row-cc:last-child { border: none; padding-bottom: 0; }
-                .activity-bullet { width: 8px; height: 8px; border-radius: 50%; background: #D2C7BB; }
-                .activity-bullet.create { background: #2D5A27; box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1); }
-                .activity-bullet.update { background: #4A5D73; box-shadow: 0 0 0 4px rgba(74, 93, 115, 0.1); }
-                .activity-bullet.delete { background: #b91c1c; box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.1); }
-                .activity-info-cc p { font-size: 0.9rem; color: #2B2B2B; margin-bottom: 0.2rem; }
-                .activity-meta-cc { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #787878; }
-                .dot { width: 3px; height: 3px; border-radius: 50%; background: #D2C7BB; }
-                
-                .btn-text-only { background: none; border: none; font-weight: 700; color: #4A5D73; cursor: pointer; font-size: 0.85rem; }
-                .text-muted { color: #D2C7BB; }
-
-                @media (max-width: 1200px) {
-                    .cc-main-grid { grid-template-columns: 1fr; }
-                    .cc-bi-grid { grid-template-columns: repeat(2, 1fr); }
-                }
-                @media (max-width: 768px) {
-                    .cc-bi-grid { grid-template-columns: 1fr; }
-                    .cc-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-                }
-
-                .admin-dashboard-loading {
-                    height: 80vh; display: flex; flex-direction: column; 
-                    align-items: center; justify-content: center; gap: 1rem;
-                    color: #4A5D73;
-                }
-                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-                .animate-spin { animation: spin 1s linear infinite; }
-            `}</style>
-        </div>
+        </>
     );
 };
 

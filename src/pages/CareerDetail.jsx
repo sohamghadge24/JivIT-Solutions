@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import PremiumDetail from '../components/PremiumDetail';
 import { adminService } from '../lib/adminService';
 
 const CareerDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -42,7 +43,7 @@ const CareerDetail = () => {
             subtitle={job.type}
             description={job.description}
             ctaText="Apply for Position"
-            ctaAction={() => window.location.href = `mailto:careers@jivitsolutions.com?subject=Application for ${job.title}`}
+            ctaAction={() => navigate(`/careers/${job.id}/apply`)}
             imagePrimary="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80" // Fallback or specific default for careers
             imageSecondary="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80"
         />

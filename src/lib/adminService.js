@@ -205,6 +205,34 @@ export const adminService = {
         return data;
     },
 
+    async createStudentProgram(programData) {
+        const { data, error } = await supabase.from('student_programs').insert([{ ...programData }]).select().single();
+        if (error) throw error;
+        await this.logAction('CREATE', 'student_programs', data.id, { title: data.title });
+        cacheManager.invalidate('programs_true');
+        cacheManager.invalidate('programs_false');
+        return data;
+    },
+
+    async updateStudentProgram(id, updates) {
+        const { data, error } = await supabase.from('student_programs').update(updates).eq('id', id).select().single();
+        if (error) throw error;
+        await this.logAction('UPDATE', 'student_programs', id, updates);
+        cacheManager.invalidate('programs_true');
+        cacheManager.invalidate('programs_false');
+        cacheManager.invalidate(`program_${id}`);
+        return data;
+    },
+
+    async softDeleteStudentProgram(id) {
+        const { error } = await supabase.from('student_programs').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+        if (error) throw error;
+        await this.logAction('DELETE', 'student_programs', id);
+        cacheManager.invalidate('programs_true');
+        cacheManager.invalidate('programs_false');
+        cacheManager.invalidate(`program_${id}`);
+    },
+
     // --- Blogs Operations ---
 
     async getBlogs(includeDrafts = false) {
@@ -271,6 +299,12 @@ export const adminService = {
         const { data, error } = await supabase.from('applications').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         return data;
+    },
+
+    async submitApplication(appData) {
+        const { error } = await supabase.from('applications').insert([appData]);
+        if (error) throw error;
+        return true;
     },
 
     async updateApplicationStatus(id, status) {

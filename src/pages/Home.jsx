@@ -1,46 +1,21 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from "framer-motion";
-
-const fadeInUp = {
-    initial: { opacity: 0, y: 30 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
-};
-
-const staggerContainer = {
-    initial: {},
-    whileInView: {
-        transition: {
-            staggerChildren: 0.15
-        }
-    },
-    viewport: { once: true }
-};
-
-import heroEarth from "../assets/hero_earth_editorial.png";
-
 import { adminService } from '../lib/adminService';
+import heroEarth from "../assets/hero_earth_editorial.png";
+import ScrollReveal from '../animations/ScrollReveal';
 
 const Home = () => {
-    const { scrollY } = useScroll();
-    const earthRotate = useTransform(scrollY, [0, 1000], [0, 15]); // Subtle rotation
-    const earthY = useTransform(scrollY, [0, 1000], [0, 100]); // Parallax drift
-
-    const [settings, setSettings] = useState({
-        site_name: 'JivIT Solutions',
-        hero_tagline: 'Orchestrating Digital Future & Human Potential',
-        hero_description: 'JivIT Solutions bridges the gap between enterprise-grade engineering and holistic human growth. We build resilient platforms and empower thriving organizations.',
-        mission_it_label: 'IT Solutions',
-        mission_wellness_label: 'Wellness Services'
-    });
-
     const [missionData, setMissionData] = useState({
         it: null,
         wellness: null
     });
     const [latestBlogs, setLatestBlogs] = useState([]);
+    const [settings, setSettings] = useState({
+        hero_tagline: 'Orchestrating Digital Future & Human Potential',
+        hero_description: 'JivIT Solutions bridges the gap between enterprise-grade engineering and holistic human growth. We build resilient platforms and empower thriving organizations. Amalgamation of Inner transformation through Information Technology',
+        mission_it_label: 'IT Solutions',
+        mission_wellness_label: 'Wellness'
+    });
 
     useEffect(() => {
         const fetchHomeData = async () => {
@@ -57,10 +32,12 @@ const Home = () => {
                 if (services && Array.isArray(services)) {
                     const itService = services.find(s => s.category === 'it-solutions');
                     const wellnessService = services.find(s => s.category === 'wellness');
+                    const platformService = services.find(s => s.category === 'platform-enablement');
 
                     setMissionData({
                         it: itService,
-                        wellness: wellnessService
+                        wellness: wellnessService,
+                        platform: platformService
                     });
                 }
 
@@ -79,416 +56,236 @@ const Home = () => {
     return (
         <div className="home-wrapper">
             {/* ================= HERO SECTION ================= */}
-            <section className="hero-premium">
-                <div className="container hero-grid">
-                    <motion.div
-                        className="hero-content"
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                        <motion.span
-                            className="hero-badge"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                        >
-                            Global Technology & Transformation
-                        </motion.span>
-
-                        <motion.h1
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.8 }}
-                            dangerouslySetInnerHTML={{ __html: settings.hero_tagline.replace('&', '&amp;').replace('Future', '<span class="gradient-text">Future</span>').replace('Potential', '<span class="gradient-text">Potential</span>') }}
-                        />
-
-                        <motion.p
-                            className="hero-description"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.6 }}
-                        >
-                            {settings.hero_description}
-                        </motion.p>
-
-                        <motion.div
-                            className="hero-cta"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.8 }}
-                        >
-                            <Link to="/products-services" className="btn btn-primary">
-                                Explore IT Solutions
-                            </Link>
-                            <Link to="/products-services" className="btn btn-outline">
-                                Discover Wellness
-                            </Link>
-                        </motion.div>
-
-                        <motion.div
-                            className="hero-stats"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1 }}
-                        >
-                            <div className="stat-item">
-                                <h3>Global</h3>
-                                <p>Reach</p>
+            <section className="hero-premium relative overflow-hidden flex items-center bg-[var(--bg-main)] min-h-[800px] h-screen pt-20">
+                <div className="container relative z-10 max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center px-6">
+                    <div className="flex flex-col items-start text-left">
+                        <ScrollReveal>
+                            <div className="font-body text-xs tracking-[0.3em] uppercase text-[var(--text-tertiary)] mb-6">
+                                Elevating Human & Digital Realms
                             </div>
-                            <div className="stat-item">
-                                <h3>Enterprise</h3>
-                                <p>Standards</p>
-                            </div>
-                            <div className="stat-item">
-                                <h3>Holistic</h3>
-                                <p>Impact</p>
-                            </div>
-                        </motion.div>
-                    </motion.div>
+                            <h1 className="font-heading text-5xl md:text-6xl lg:text-[4.5rem] font-normal leading-[1.1] tracking-[-0.03em] text-[var(--text-primary)] mb-10">
+                                {settings.hero_tagline.replace('Orchestrating', 'Mastery in')}
+                            </h1>
+                            <p className="font-body text-xl md:text-2xl text-[var(--text-secondary)] font-light leading-[1.8] max-w-2xl mb-12">
+                                {settings.hero_description}
+                            </p>
+                        </ScrollReveal>
 
-                    {/* VISUAL */}
-                    <motion.div
-                        className="hero-visual"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1.4, ease: "easeOut" }}
-                    >
-                        <div className="visual-card">
-                            <img
-                                src={heroEarth}
-                                alt="Earth from space"
-                                className="earth-image"
-                                loading="eager"
-                            />
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-
-            {/* ================= DUAL MISSION SHOWCASE ================= */}
-            <section className="mission-showcase">
-                <div className="container">
-                    <motion.div className="section-header" {...fadeInUp}>
-                        <span className="section-label">Our Dual Mission</span>
-                        <h2>Two Pillars, One Vision</h2>
-                        <p className="section-description">
-                            We bridge the digital and the personal, combining enterprise-grade
-                            IT solutions with transformative wellness services.
-                        </p>
-                    </motion.div>
-
-                    <div className="mission-grid">
-                        {/* IT Solutions Pillar */}
-                        <motion.div className="mission-card it-pillar" {...fadeInUp}>
-                            <div className="mission-image">
-                                <img
-                                    src={missionData.it?.image_url || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80"}
-                                    alt="Technology and digital innovation"
-                                />
-                                <div className="mission-overlay"></div>
-                            </div>
-                            <div className="mission-content">
-                                <span className="mission-tag">
-                                    {settings.mission_it_label}
-                                </span>
-
-                                <h3>{missionData.it?.title || 'Enterprise IT Solutions'}</h3>
-                                <p>
-                                    {missionData.it?.subtitle || 'From cloud architecture to custom software development, we deliver scalable infrastructure.'}
-                                </p>
-                                <ul className="mission-features">
-                                    {missionData.it?.benefits?.slice(0, 4).map((b, i) => <li key={i}>{b}</li>) || (
-                                        <>
-                                            <li>Strategic Technology Consulting</li>
-                                            <li>Custom Platform Development</li>
-                                            <li>Cloud Infrastructure & DevOps</li>
-                                            <li>Cybersecurity & Compliance</li>
-                                        </>
-                                    )}
-                                </ul>
-                                <Link to="/products-services" className="text-link">
-                                    Explore IT Services →
+                        <ScrollReveal>
+                            <div className="flex flex-wrap gap-5">
+                                <Link to="/wellness" className="px-8 py-4 bg-[var(--text-primary)] text-[var(--bg-white)] rounded-full text-sm tracking-[0.05em] transition-all hover:bg-transparent hover:text-[var(--text-primary)] border border-[var(--text-primary)]">
+                                    Astro Wellness
+                                </Link>
+                                <Link to="/it-solutions" className="px-8 py-4 bg-transparent text-[var(--text-primary)] rounded-full text-sm tracking-[0.05em] transition-all hover:border-[var(--text-primary)] border border-black/10">
+                                    IT Solutions
                                 </Link>
                             </div>
-                        </motion.div>
+                        </ScrollReveal>
 
-                        {/* Wellness Pillar */}
-                        <motion.div
-                            className="mission-card wellness-pillar"
-                            {...fadeInUp}
-                            transition={{ ...fadeInUp.transition, delay: 0.2 }}
-                        >
-                            <div className="mission-image">
-                                <img
-                                    src={missionData.wellness?.image_url || "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80"}
-                                    alt="Mindfulness and inner peace"
-                                />
-                                <div className="mission-overlay wellness-overlay"></div>
-                            </div>
-                            <div className="mission-content">
-                                <span className="mission-tag wellness-tag">
-                                    {settings.mission_wellness_label}
-                                </span>
-
-                                <h3>{missionData.wellness?.title || 'Wellness & Transformation'}</h3>
-                                <p>
-                                    {missionData.wellness?.subtitle || 'A dedicated platform for healers, coaches, and wellness professionals.'}
-                                </p>
-                                <ul className="mission-features">
-                                    {missionData.wellness?.benefits?.slice(0, 4).map((b, i) => <li key={i}>{b}</li>) || (
-                                        <>
-                                            <li>Mindfulness & Meditation Programs</li>
-                                            <li>Life & Wellness Coaching</li>
-                                            <li>Holistic Health Practitioners</li>
-                                            <li>Personal Transformation Journeys</li>
-                                        </>
-                                    )}
-                                </ul>
-                                <Link to="/products-services" className="text-link">
-                                    Explore Wellness Services →
-                                </Link>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ================= HOW WE WORK ================= */}
-            <section className="process-section">
-                <div className="container">
-                    <motion.div className="section-header centered" {...fadeInUp}>
-                        <span className="section-label">Our Approach</span>
-                        <h2>Excellence in Every Step</h2>
-                    </motion.div>
-
-                    <motion.div
-                        className="process-grid"
-                        variants={staggerContainer}
-                        initial="initial"
-                        whileInView="whileInView"
-                    >
-                        {[
-                            {
-                                number: "01",
-                                title: "Discovery & Strategy",
-                                description: "We begin by understanding your unique challenges, goals, and vision.",
-
-                            },
-                            {
-                                number: "02",
-                                title: "Design & Development",
-                                description: "Our team crafts tailored solutions with precision and creativity.",
-
-                            },
-                            {
-                                number: "03",
-                                title: "Launch & Scale",
-                                description: "We deploy, monitor, and continuously optimize for peak performance.",
-
-                            },
-                            {
-                                number: "04",
-                                title: "Support & Growth",
-                                description: "Long-term partnership ensuring your sustained success.",
-
-                            }
-                        ].map((step) => (
-                            <motion.div key={step.number} className="process-card" variants={fadeInUp}>
-                                <div className="process-icon">{step.icon}</div>
-                                <span className="process-number">{step.number}</span>
-                                <h3>{step.title}</h3>
-                                <p>{step.description}</p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* ================= WELLNESS IMAGE SECTION ================= */}
-            <section className="wellness-visual">
-                <div className="container">
-                    <div className="wellness-grid">
-                        <motion.div className="wellness-content" {...fadeInUp}>
-                            <span className="section-label wellness-label">Holistic Balance</span>
-                            <h2>Nurturing Mind, Body & Spirit</h2>
-                            <p>
-                                Our wellness platform connects you with certified practitioners who guide
-                                your journey toward inner peace, mental clarity, and holistic well-being.
-                            </p>
-                            <p>
-                                Whether you're seeking mindfulness coaching, life transformation programs,
-                                or holistic health guidance, we curate experiences that honor your unique path.
-                            </p>
-                            <Link to="/wellness" className="btn btn-outline">
-                                Explore Wellness Services
-                            </Link>
-                        </motion.div>
-
-                        <motion.div
-                            className="wellness-images"
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <div className="wellness-image-grid">
-                                <div className="wellness-img large">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80"
-                                        alt="Meditation and mindfulness"
-                                    />
-                                </div>
-                                <div className="wellness-img small">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&w=400&q=80"
-                                        alt="Yoga and balance"
-                                    />
-                                </div>
-                                <div className="wellness-img small">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1528319725582-ddc096101511?auto=format&fit=crop&w=400&q=80"
-                                        alt="Nature and serenity"
-                                    />
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-
-
-            {/* ================= LATEST NARRATIVES ================= */}
-            {
-                latestBlogs.length > 0 && (
-                    <section className="latest-narratives" style={{ padding: '80px 0', background: 'var(--color-bg-secondary)' }}>
-                        <div className="container">
-                            <motion.div className="section-header centered" {...fadeInUp}>
-                                <span className="section-label">Insights & Perspectives</span>
-                                <h2>Latest Narratives</h2>
-                            </motion.div>
-
-                            <div className="narratives-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', marginTop: '40px' }}>
-                                {latestBlogs.map((blog, idx) => (
-                                    <motion.div
-                                        key={blog.id}
-                                        className="blog-card"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.1 }}
-                                        viewport={{ once: true }}
-                                        style={{ background: 'var(--color-bg-primary)', borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}
-                                    >
-                                        <Link to={`/blog/${blog.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                            <div className="blog-img" style={{ height: '200px', overflow: 'hidden' }}>
-                                                <img
-                                                    src={blog.image_url || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800"}
-                                                    alt={blog.title}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
-                                                />
-                                            </div>
-                                            <div className="blog-content" style={{ padding: '20px' }}>
-                                                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-accent)', letterSpacing: '0.5px' }}>
-                                                    {blog.category}
-                                                </span>
-                                                <h3 style={{ fontSize: '1.25rem', margin: '10px 0', lineHeight: 1.4 }}>{blog.title}</h3>
-                                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                    {blog.excerpt}
-                                                </p>
-                                                <span className="read-more" style={{ display: 'inline-block', marginTop: '15px', color: 'var(--color-primary)', fontWeight: 500, fontSize: '0.9rem' }}>
-                                                    Read Entry →
-                                                </span>
-                                            </div>
-                                        </Link>
-                                    </motion.div>
+                        <ScrollReveal>
+                            <div className="flex gap-16 mt-20 pt-10 border-t border-black/5 w-full">
+                                {[{ val: 'Tier-1', lbl: 'Enterprise Standards' }, { val: 'Global', lbl: 'Scalable Reach' }].map((stat, i) => (
+                                    <div key={i}>
+                                        <div className="font-heading text-xl text-[var(--text-primary)] mb-1">{stat.val}</div>
+                                        <div className="font-body text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)]">{stat.lbl}</div>
+                                    </div>
                                 ))}
                             </div>
+                        </ScrollReveal>
+                    </div>
+
+                    <ScrollReveal className="relative w-full flex justify-center">
+                        <div className="relative w-full max-w-[600px] aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
+                            <img
+                                src={heroEarth}
+                                alt="Global Enterprise Systems"
+                                className="w-full h-full object-cover filter contrast-[1.05] brightness-95 saturate-[0.8]"
+                            />
+                            <div className="absolute inset-0 border border-white/20 rounded-3xl pointer-events-none" />
                         </div>
-                    </section>
-                )
-            }
+                    </ScrollReveal>
+                </div>
 
-            {/* ================= STUDENTS & RESEARCH ================= */}
-            <section className="future-section">
+                {/* Subtle Background Shifts */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--bg-main)] pointer-events-none z-[2]" />
+            </section>
+
+            {/* ================= CORE PILLARS SECTION ================= */}
+            <section className="about-values py-32 bg-[var(--bg-main)]">
                 <div className="container">
-                    <motion.div className="section-header centered" {...fadeInUp}>
-                        <span className="section-label">Empowering the Future</span>
-                        <h2>Students & Research</h2>
-                        <p className="section-description">
-                            We invest in the next generation through rigorous internships and
-                            open research initiatives.
+                    <ScrollReveal className="text-center mb-20">
+                        <span className="block mb-4 text-sm uppercase tracking-[0.15em] text-[var(--text-secondary)]">Our Core Ecosystem</span>
+                        <h2 className="text-5xl font-medium text-[var(--text-primary)] mb-6 tracking-tight">Engineering Digital & Human Potential</h2>
+                        <p className="text-xl text-[var(--text-secondary)] max-w-3xl mx-auto leading-relaxed">
+                            We bridge the gap between scalable enterprise infrastructure, personal well-being, and business enablement. A holistic approach to modern growth.
                         </p>
-                    </motion.div>
+                    </ScrollReveal>
 
-                    <div className="future-grid">
-                        <motion.div className="future-card" {...fadeInUp}>
-                            <div className="future-image">
-                                <img
-                                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
-                                    alt="Students collaborating"
-                                />
-                            </div>
-                            <div className="future-content">
-                                <h3>Student Internship Program</h3>
-                                <p>
-                                    Hands-on experience in real-world projects. We mentor students
-                                    in both IT and wellness domains, preparing them for impactful careers.
-                                </p>
-                                <Link to="/students" className="btn btn-outline">
-                                    Apply Now
-                                </Link>
-                            </div>
-                        </motion.div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <ScrollReveal className="p-10 bg-[var(--bg-white)] rounded-2xl border border-black/5 shadow-sm">
+                            <h3 className="text-2xl font-medium mb-4 text-[var(--text-primary)]">{settings.mission_it_label}</h3>
+                            <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-6">{missionData.it?.blogs || 'Enterprise-grade cloud architecture, custom software development, and scalable technical infrastructure.'}</p>
+                            <Link to="/it-solutions" className="text-sm uppercase tracking-wide text-[var(--text-primary)] border-b border-[var(--text-primary)] pb-1">Explore IT &rarr;</Link>
+                        </ScrollReveal>
 
-                        <motion.div
-                            className="future-card"
-                            {...fadeInUp}
-                            transition={{ ...fadeInUp.transition, delay: 0.2 }}
-                        >
-                            <div className="future-image">
-                                <img
-                                    src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80"
-                                    alt="Research and innovation"
-                                />
-                            </div>
-                            <div className="future-content">
-                                <h3>Open Research Initiative</h3>
-                                <p>
-                                    Publishing insights on technology, mental health, and organizational
-                                    efficiency. Our research contributes to public knowledge.
-                                </p>
-                                <Link to="/students" className="text-link">
-                                    View our findings →
-                                </Link>
-                            </div>
-                        </motion.div>
+                        <ScrollReveal className="p-10 bg-[var(--bg-white)] rounded-2xl border border-black/5 shadow-sm">
+                            <h3 className="text-2xl font-medium mb-4 text-[var(--text-primary)]">{settings.mission_wellness_label}</h3>
+                            <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-6">{missionData.wellness?.blogs || 'Transformative mindfulness, coaching, and holistic wellness platforms dedicated to human growth.'}</p>
+                            <Link to="/wellness" className="text-sm uppercase tracking-wide text-[var(--text-primary)] border-b border-[var(--text-primary)] pb-1">Explore Wellness &rarr;</Link>
+                        </ScrollReveal>
+
+                        <ScrollReveal className="p-10 bg-[var(--bg-white)] rounded-2xl border border-black/5 shadow-sm">
+                            <h3 className="text-2xl font-medium mb-4 text-[var(--text-primary)]">Platform Enablement</h3>
+                            <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-6">{missionData.platform?.blogs || 'Digital empowerment for independent professionals and small businesses. We provide the tools you need to scale.'}</p>
+                            <Link to="/platform-enablement" className="text-sm uppercase tracking-wide text-[var(--text-primary)] border-b border-[var(--text-primary)] pb-1">Explore Platform &rarr;</Link>
+                        </ScrollReveal>
                     </div>
                 </div>
             </section>
 
-            {/* ================= CTA SECTION ================= */}
-            <section className="cta-final">
+            {/* ================= CAPABILITIES / SERVICES ================= */}
+            <section className="services-features py-32 bg-[var(--bg-alt)]">
                 <div className="container">
-                    <motion.div className="cta-content" {...fadeInUp}>
-                        <h2>Elevating Enterprises, Empowering Evolution</h2>
-                        <p>
-                            Whether you need enterprise IT solutions or personal wellness guidance,
-                            we're here to support your journey.
-                        </p>
-                        <div className="cta-buttons">
-                            <Link to="/contact" className="btn btn-primary btn-large">
-                                Get in Touch
-                            </Link>
-                            <Link to="/" className="btn btn-outline btn-large">
-                                Learn More About Us
-                            </Link>
-                        </div>
-                    </motion.div>
+                    <ScrollReveal className="mb-20">
+                        <span className="block mb-4 text-sm uppercase tracking-[0.15em] text-[var(--text-secondary)]">Capabilities</span>
+                        <h2 className="text-5xl font-medium text-[var(--text-primary)] max-w-2xl tracking-tight m-0">Structured for impact across all verticals</h2>
+                    </ScrollReveal>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {[
+                            { category: 'IT Solutions', title: 'Cloud Infrastructure', benefit: 'Reduce latency by 40% with globally distributed edge networks.' },
+                            { category: 'IT Solutions', title: 'Data Intelligence', benefit: 'Turn raw data into actionable insights with real-time analytics.' },
+                            { category: 'Wellness', title: 'Life Coaching', benefit: 'Personalized programs to align professional ambition with inner peace.' },
+                            { category: 'Platform', title: 'Business Visibility', benefit: 'End-to-end digital enablement ensuring your services reach the right audience.' }
+                        ].map((service, idx) => (
+                            <ScrollReveal key={idx} className="p-10 bg-[var(--bg-white)] border-t-2 border-[var(--text-primary)] flex flex-col">
+                                <span className="text-xs uppercase text-[var(--text-secondary)] tracking-widest mb-4">{service.category}</span>
+                                <h3 className="text-2xl font-semibold mb-4">{service.title}</h3>
+                                <p className="text-[var(--text-secondary)] text-lg leading-relaxed">{service.benefit}</p>
+                            </ScrollReveal>
+                        ))}
+                    </div>
                 </div>
             </section>
-        </div >
+
+            {/* ================= PROCESS ================= */}
+            <section className="process-horizontal py-32 bg-[var(--bg-main)]">
+                <div className="container">
+                    <ScrollReveal className="mb-20">
+                        <span className="block mb-4 text-sm uppercase tracking-[0.15em] text-[var(--text-secondary)]">Methodology</span>
+                        <h2 className="text-5xl font-medium text-[var(--text-primary)] tracking-tight m-0">How we deliver excellence</h2>
+                    </ScrollReveal>
+
+                    <ScrollReveal>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+                            {[
+                                { num: '01', title: 'Audit & Align', desc: 'Thorough analysis of existing infrastructure and alignment with core personal or business objectives.' },
+                                { num: '02', title: 'Strategic Design', desc: 'Drafting scalable, secure systems or personalized wellness blueprints tailored to specific requirements.' },
+                                { num: '03', title: 'Execution', desc: 'Agile development and guided implementation with rigorous standards at every stage.' },
+                                { num: '04', title: 'Sustain & Scale', desc: 'Continuous monitoring, integration, and optimization for long-term growth.' }
+                            ].map((step, idx) => (
+                                <div key={idx} className="pl-8 border-l border-black/10">
+                                    <div className="text-2xl font-heading text-[var(--text-secondary)] mb-6">{step.num}</div>
+                                    <h3 className="text-2xl font-medium mb-4 text-[var(--text-primary)]">{step.title}</h3>
+                                    <p className="text-[var(--text-secondary)] text-base leading-relaxed">{step.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollReveal>
+                </div>
+            </section>
+
+            {/* ================= CASE STUDIES / IMPACT ================= */}
+            <section className="case-studies py-32 bg-[#111215] text-white">
+                <div className="container">
+                    <ScrollReveal className="mb-20">
+                        <span className="block mb-4 text-sm uppercase tracking-[0.15em] text-white/60">Impact</span>
+                        <h2 className="text-5xl font-medium tracking-tight m-0">Proven results at scale</h2>
+                    </ScrollReveal>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        {[
+                            { category: 'IT Solutions', client: 'Global FinTech', metric: '99.999%', metricDesc: 'Uptime Achieved', desc: 'Re-architected core transaction ledger to handle 10x throughput with zero data loss.' },
+                            { category: 'Wellness', client: 'Executive Coaching', metric: '40%', metricDesc: 'Productivity Increase', desc: 'Structured mindfulness programs delivered dramatic improvements in corporate leadership focus.' },
+                            { category: 'Platform Enablement', client: 'Independent Practitioners', metric: '3x', metricDesc: 'Client Acquisition', desc: 'Empowered individual healers with enterprise-level booking and visibility platforms.' }
+                        ].map((study, idx) => (
+                            <ScrollReveal key={idx} className="p-12 bg-[#1C1D21] rounded-2xl relative">
+                                <div className="text-xs uppercase tracking-widest text-emerald-400 mb-4">{study.category}</div>
+                                <div className="text-sm uppercase tracking-widest text-white/50 mb-10">{study.client}</div>
+                                <div className="text-6xl font-light text-white mb-2 leading-none">{study.metric}</div>
+                                <div className="text-base text-[#637081] font-medium mb-8">{study.metricDesc}</div>
+                                <p className="text-lg text-white/70 leading-relaxed">{study.desc}</p>
+                            </ScrollReveal>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ================= TESTIMONIALS ================= */}
+            <section className="testimonials py-32 bg-[var(--bg-alt)]">
+                <div className="container max-w-4xl text-center">
+                    <ScrollReveal>
+                        <div className="text-5xl text-[var(--text-secondary)] mb-4 leading-none">"</div>
+                        <h3 className="text-3xl font-normal text-[var(--text-primary)] leading-snug mb-10">
+                            JivIT Solutions brought an unmatched level of engineering rigor to our organization. They didn't just write code; they transformed our entire digital operating model.
+                        </h3>
+                        <div className="flex flex-col items-center">
+                            <div className="font-semibold text-lg text-[var(--text-primary)]">Sarah Jenkins</div>
+                            <div className="text-base text-[var(--text-secondary)]">CTO, Enterprise Logistics Plus</div>
+                        </div>
+                    </ScrollReveal>
+                </div>
+            </section>
+
+            {/* ================= CAREERS / STUDENTS ================= */}
+            <section className="careers-section py-32 bg-[var(--bg-main)]">
+                <div className="container">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                        <ScrollReveal>
+                            <span className="block mb-4 text-sm uppercase tracking-[0.15em] text-[var(--text-secondary)]">Careers</span>
+                            <h2 className="text-5xl font-medium text-[var(--text-primary)] mb-6 tracking-tight">Join the ecosystem</h2>
+                            <p className="text-xl text-[var(--text-secondary)] mb-10 leading-relaxed max-w-lg">
+                                We are always looking for exceptional engineers, product thinkers, and researchers to push the boundaries of enterprise technology.
+                            </p>
+                            <Link to="/students" className="inline-block px-8 py-4 bg-[var(--text-primary)] text-white rounded shadow-md hover:shadow-lg transition">View Open Roles</Link>
+                        </ScrollReveal>
+                        <ScrollReveal className="flex flex-col gap-6">
+                            <div className="p-8 bg-[var(--bg-white)] border border-black/5 rounded-xl flex justify-between items-center shadow-sm hover:shadow-md transition">
+                                <div>
+                                    <h4 className="text-xl font-medium mb-2 text-[var(--text-primary)]">Senior Cloud Architect</h4>
+                                    <p className="text-[var(--text-secondary)] m-0">Remote / Global</p>
+                                </div>
+                                <Link to="/students" className="px-6 py-3 border border-[var(--text-primary)] text-[var(--text-primary)] rounded font-medium hover:bg-[var(--text-primary)] hover:text-white transition">Apply</Link>
+                            </div>
+                            <div className="p-8 bg-[var(--bg-white)] border border-black/5 rounded-xl flex justify-between items-center shadow-sm hover:shadow-md transition">
+                                <div>
+                                    <h4 className="text-xl font-medium mb-2 text-[var(--text-primary)]">Systems Engineering Intern</h4>
+                                    <p className="text-[var(--text-secondary)] m-0">Hybrid / Headquarters</p>
+                                </div>
+                                <Link to="/students" className="px-6 py-3 border border-[var(--text-primary)] text-[var(--text-primary)] rounded font-medium hover:bg-[var(--text-primary)] hover:text-white transition">Apply</Link>
+                            </div>
+                        </ScrollReveal>
+                    </div>
+                </div>
+            </section>
+
+            {/* ================= CONTACT / CTA ================= */}
+            <section className="cta-final py-40 bg-[#9d8b8b] text-white text-center">
+                <div className="container max-w-3xl">
+                    <ScrollReveal>
+                        <h2 className="text-6xl font-medium mb-8 tracking-tight text-black">Ready to elevate your infrastructure?</h2>
+                        <p className="text-2xl text-black/70 mb-14 leading-relaxed">
+                            Schedule a technical consultation to discuss your specific requirements with our engineering leaders.
+                        </p>
+                        <form className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto" onSubmit={(e) => e.preventDefault()}>
+                            <input type="email" placeholder="Work email address" className="flex-1 py-4 px-6 rounded border-none text-base outline-none bg-[#1C1D21] text-white" />
+                            <button type="submit" className="py-4 px-8 bg-white text-black border-none rounded text-base font-semibold hover:bg-gray-100 transition whitespace-nowrap">Get Started</button>
+                        </form>
+                        <div className="mt-6 text-sm text-black/50">No commitment required.</div>
+                    </ScrollReveal>
+                </div>
+            </section>
+        </div>
     );
 };
 

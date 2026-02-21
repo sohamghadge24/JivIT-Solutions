@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import PremiumDetail from '../components/PremiumDetail';
 import { adminService } from '../lib/adminService';
 
 const ServiceDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [service, setService] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -31,7 +32,7 @@ const ServiceDetail = () => {
     if (!service) return (
         <div className="container" style={{ padding: '120px 0', textAlign: 'center' }}>
             <h2>Service not found</h2>
-            <Link to="/products-services" className="btn btn-outline" style={{ marginTop: '2rem' }}>Back to Services</Link>
+            <Link to="/" className="btn btn-outline" style={{ marginTop: '2rem' }}>Back to Home</Link>
         </div>
     );
 
@@ -45,7 +46,15 @@ const ServiceDetail = () => {
             subtitle={service.subtitle}
             description={service.description}
             ctaText="Request Consultation"
-            ctaAction={() => window.location.href = `mailto:hello@jivitsolutions.com?subject=Consultation for ${service.title}`}
+            ctaAction={() => {
+                let sType = 'it';
+                if (service.category === 'wellness') {
+                    sType = 'wellness';
+                } else if (service.category === 'platform-enablement' || service.category === 'platform') {
+                    sType = 'platform';
+                }
+                navigate('/service-form', { state: { serviceType: sType, serviceTitle: service.title } });
+            }}
             imagePrimary={service.image_url}
             imageSecondary={service.image_url}
             benefits={service.benefits} // Pass benefits array

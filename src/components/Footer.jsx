@@ -1,141 +1,146 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 import { adminService } from '../lib/adminService';
+import logo from '../assets/JivitLogo.png';
+
+// Module level cache to avoid refetching on route changes/remounts
+let cachedSettings = null;
 
 const Footer = () => {
-    const [settings, setSettings] = useState({
-        site_name: 'JivIT Solutions',
-        contact_email: 'hello@jivitsolutions.com'
-    });
+    const [settings, setSettings] = useState(
+        cachedSettings || {
+            site_name: 'JivIT Solutions',
+            contact_email: 'hello@jivitsolutions.com'
+        }
+    );
 
     useEffect(() => {
+        if (cachedSettings) return; // Don't fetch if we already have it in cache
+
         const fetchSettings = async () => {
             try {
                 const data = await adminService.getSettings();
-                if (data) setSettings(prev => ({ ...prev, ...data }));
-            } catch (error) { }
+                if (data) {
+                    cachedSettings = { ...cachedSettings, ...data };
+                    setSettings(cachedSettings);
+                }
+            } catch (error) {
+                console.error('Footer settings fetch error:', error);
+            }
         };
         fetchSettings();
     }, []);
+
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="site-footer">
-            <div className="container">
-                {/* Main Footer Content */}
-                <div className="footer-grid">
-                    {/* Company Info */}
-                    <div className="footer-column footer-brand">
-                        <h3 className="footer-logo">{settings.site_name}</h3>
-                        <p className="footer-description">
-                            Harmonizing enterprise-grade IT solutions with holistic wellness services.
-                            Building technology that scales businesses and platforms that transform lives.
+        <footer className="relative bg-[#0B0F17] text-slate-300 pt-20 pb-10 overflow-hidden border-t border-slate-800/80">
+            {/* Subtle Gradient / Noise top border effect */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent"></div>
+
+            {/* Soft background radial glow */}
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-900/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div className="max-w-[1280px] mx-auto px-6 lg:px-8 relative z-10">
+                {/* Top Matrix - 4 Columns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
+
+                    {/* Brand Column */}
+                    <div className="lg:col-span-4 flex flex-col gap-8 pr-0 lg:pr-8">
+                        <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
+                            <img
+                                src={logo}
+                                alt={settings.site_name}
+                                className="h-[52px] lg:h-[64px] w-auto object-contain brightness-0 invert opacity-90"
+                            />
+                        </Link>
+                        <p className="text-sm leading-relaxed text-slate-400 font-light max-w-sm">
+                            Enterprise-grade software engineering and holistic human enablement platforms. Designed for resilience.
                         </p>
-                        <div className="footer-contact">
-                            <p>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                                    <polyline points="22,6 12,13 2,6" />
-                                </svg>
-                                <a href="mailto:hello@jivitsolutions.com">{settings.contact_email}</a>
-                            </p>
-                            <p>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                Pune, Maharashtra, India
-                            </p>
+                    </div>
+
+                    {/* Links Columns Container */}
+                    <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-10">
+                        {/* Column 2 */}
+                        <div className="flex flex-col gap-5">
+                            <h4 className="text-xs font-semibold tracking-wider uppercase text-slate-500">Platform</h4>
+                            <div className="flex flex-col gap-3.5">
+                                <Link to="/it-solutions" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">IT Solutions</Link>
+                                <Link to="/wellness" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Wellness Systems</Link>
+                                <Link to="/platform-enablement" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Enablement</Link>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Services */}
-                    <div className="footer-column">
-                        <h4 className="footer-heading">Services</h4>
-                        <ul className="footer-links">
-                            <li><Link to="/products-services">Products & Services</Link></li>
-                            <li><Link to="/products-services">IT Solutions</Link></li>
-                            <li><Link to="/products-services">Wellness & Healing</Link></li>
-                            <li><Link to="/products-services">Platform Enablement</Link></li>
-                        </ul>
-                    </div>
+                        {/* Column 3 */}
+                        <div className="flex flex-col gap-5">
+                            <h4 className="text-xs font-semibold tracking-wider uppercase text-slate-500">Company</h4>
+                            <div className="flex flex-col gap-3.5">
+                                <Link to="/about" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">About Us</Link>
+                                <Link to="/students" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Student Programs</Link>
+                                <Link to="/careers" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Careers</Link>
+                                <Link to="/blog" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Narratives</Link>
+                            </div>
+                        </div>
 
-                    {/* Company */}
-                    <div className="footer-column">
-                        <h4 className="footer-heading">Company</h4>
-                        <ul className="footer-links">
-                            <li><Link to="/">About Us</Link></li>
-                            <li><Link to="/students">Student Programs</Link></li>
-                            <li><Link to="/students">Research & Innovation</Link></li>
-                            <li><Link to="/careers">Careers</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Connect */}
-                    <div className="footer-column">
-                        <h4 className="footer-heading">Connect</h4>
-                        <ul className="footer-links">
-                            <li><Link to="/contact">Contact Us</Link></li>
-                            <li><Link to="/contact">Book a Consultation</Link></li>
-                            <li><Link to="/login">Client Login</Link></li>
-                            <li><a href="mailto:students@jivitsolutions.com">Student Applications</a></li>
-                        </ul>
+                        {/* Column 4 */}
+                        <div className="flex flex-col gap-5">
+                            <h4 className="text-xs font-semibold tracking-wider uppercase text-slate-500">Connect</h4>
+                            <div className="flex flex-col gap-3.5">
+                                <Link to="/contact" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Contact Sales</Link>
+                                <Link to="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Client Portal</Link>
+                                <a href={`mailto:${settings.contact_email}`} className="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                                    Support
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Footer Bottom */}
-                <div className="footer-bottom">
-                    <div className="footer-bottom-left">
-                        <p className="copyright">
-                            © {new Date().getFullYear()} JivIT Solutions. All rights reserved.
-                        </p>
-                        <div className="footer-legal">
-                            <a href="/privacy-policy">Privacy Policy</a>
-                            <span className="separator">·</span>
-                            <a href="/terms">Terms & Conditions</a>
-                            <span className="separator">·</span>
-                            <a href="/disclaimer">Disclaimer</a>
-                        </div>
+                {/* Bottom Section */}
+                <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-medium">
+                        <span>© {currentYear} {settings.site_name}. All rights reserved.</span>
+                        <div className="hidden md:block w-1 h-1 bg-slate-700 rounded-full"></div>
+                        <Link to="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
+                        <div className="hidden md:block w-1 h-1 bg-slate-700 rounded-full"></div>
+                        <Link to="/terms" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
                     </div>
 
-                    <div className="footer-social">
+                    <div className="flex items-center gap-5">
                         <a
-                            href="https://linkedin.com/company/jivit-solutions"
+                            href="https://linkedin.com"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="LinkedIn"
+                            className="text-slate-500 hover:text-white transition-colors p-1"
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                            </svg>
+                            <Linkedin className="w-4 h-4" />
                         </a>
                         <a
-                            href="https://twitter.com/jivitsolutions"
+                            href="https://twitter.com"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Twitter"
+                            className="text-slate-500 hover:text-white transition-colors p-1"
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                            </svg>
+                            <Twitter className="w-4 h-4" />
                         </a>
                         <a
-                            href="https://medium.com/@jivitsolutions"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Medium"
-                        >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" />
-                            </svg>
-                        </a>
-                        <a
-                            href="https://github.com/jivitsolutions"
+                            href="https://github.com"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="GitHub"
+                            className="text-slate-500 hover:text-white transition-colors p-1"
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                            </svg>
+                            <Github className="w-4 h-4" />
+                        </a>
+                        <a
+                            href={`mailto:${settings.contact_email}`}
+                            aria-label="Email"
+                            className="text-slate-500 hover:text-white transition-colors p-1"
+                        >
+                            <Mail className="w-4 h-4" />
                         </a>
                     </div>
                 </div>

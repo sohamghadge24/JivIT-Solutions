@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { adminService } from '../lib/adminService';
+import ScrollReveal from '../animations/ScrollReveal';
 
 const Blog = () => {
     const [blogs, setBlogs] = useState([]);
@@ -30,10 +30,10 @@ const Blog = () => {
     return (
         <main className="blog-page">
             <section className="page-header">
-                <div className="container">
+                <ScrollReveal className="container">
                     <h1>Narratives</h1>
                     <p className="page-lead">Insights on technology, wellness, and the future of transformation.</p>
-                </div>
+                </ScrollReveal>
             </section>
 
             <div className="container">
@@ -44,13 +44,7 @@ const Blog = () => {
                     padding: '60px 0'
                 }}>
                     {blogs.map((post) => (
-                        <motion.article
-                            key={post.id}
-                            className="blog-card"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                        >
+                        <ScrollReveal key={post.id} className="blog-card">
                             <Link to={`/blog/${post.slug}`}>
                                 <div className="blog-img" style={{
                                     height: '240px',
@@ -72,7 +66,7 @@ const Blog = () => {
                                     <p style={{ color: 'var(--text-secondary)' }}>{post.excerpt}</p>
                                 </div>
                             </Link>
-                        </motion.article>
+                        </ScrollReveal>
                     ))}
                 </div>
             </div>

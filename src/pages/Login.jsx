@@ -138,10 +138,10 @@ const Login = () => {
                             {loading ? 'Signing In...' : 'Sign In'}
                         </button>
 
-                        <div className="login-hint" style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#666', borderLeft: '3px solid #007bff', paddingLeft: '10px', background: '#f8f9fa', padding: '10px' }}>
+                        {/* <div className="login-hint" style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#666', borderLeft: '3px solid #007bff', paddingLeft: '10px', background: '#f8f9fa', padding: '10px' }}>
                             <strong>Demo Admin:</strong> admin@jivit.com / admin1003<br />
                             <strong>Demo User:</strong> user@jivit.com / user123
-                        </div>
+                        </div> */}
 
                         <div className="form-footer">
                             <p>Don't have an account? <Link to="/register">Create Access</Link></p>

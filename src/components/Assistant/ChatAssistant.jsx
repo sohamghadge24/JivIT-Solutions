@@ -11,7 +11,7 @@ const INITIAL_MESSAGE = {
 };
 
 const QUICK_ACTIONS = [
-    { label: 'Our Services', value: 'services', link: '/products-services' },
+    { label: 'Our Services', value: 'services', link: '/it-solutions' },
     { label: 'Careers', value: 'careers', link: '/careers' },
     { label: 'For Students', value: 'students', link: '/students' },
     { label: 'Contact Us', value: 'contact', link: '/contact' }

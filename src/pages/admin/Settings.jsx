@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../lib/adminService';
-import {
-    Settings as SettingsIcon,
-    Save,
-    Globe,
-    Mail,
-    Shield,
-    Bell,
-    Info,
-    RefreshCw
-} from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
 
 const Settings = () => {
     const [settings, setSettings] = useState({
@@ -46,24 +37,10 @@ const Settings = () => {
         }
     };
 
-    const handleSave = async (key, value) => {
-        setSaving(true);
-        try {
-            await adminService.updateSetting(key, value);
-            setMessage({ type: 'success', text: `Setting "${key}" updated successfully!` });
-            setTimeout(() => setMessage(null), 3000);
-        } catch (error) {
-            setMessage({ type: 'error', text: `Failed to update ${key}` });
-        } finally {
-            setSaving(false);
-        }
-    };
-
     const handleBulkSave = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            // In a real app, you might want a bulk update endpoint or loop through
             const promises = Object.entries(settings).map(([key, value]) =>
                 adminService.updateSetting(key, value)
             );
@@ -77,55 +54,66 @@ const Settings = () => {
         }
     };
 
-    if (loading) return <div className="loading-state">Loading configuration...</div>;
+    if (loading) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-500">
+                <span className="material-symbols-outlined animate-spin text-3xl mb-2 text-primary">sync</span>
+                <p>Loading configuration...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="admin-page">
-            <header className="page-header-admin">
-                <div>
-                    <h1>System Settings</h1>
-                    <p>Configure global parameters and platform preferences.</p>
-                </div>
-                <div className="flex gap-3">
+        <div className="flex-1 flex justify-center py-8 px-4 sm:px-10 overflow-y-auto w-full">
+            <div className="w-full max-w-[1024px] flex flex-col gap-6">
+                {/* Page Header */}
+                <div className="flex flex-col gap-1 relative">
+                    <h1 className="text-slate-900 dark:text-white text-3xl font-black tracking-tight">System Settings</h1>
+                    <p className="text-slate-500 dark:text-slate-400 text-base">Configure global parameters and platform preferences.</p>
                     <button
                         onClick={fetchSettings}
-                        className="btn-icon-secondary"
+                        className="absolute right-0 top-0 p-2 text-slate-400 hover:text-primary bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
                         title="Reload"
                     >
                         <RefreshCw size={18} />
                     </button>
                 </div>
-            </header>
 
-            {message && (
-                <div className={`status-banner ${message.type}`}>
-                    <Info size={18} />
-                    <span>{message.text}</span>
-                </div>
-            )}
+                {message && (
+                    <div className={`flex items-center gap-3 p-4 rounded-xl border font-medium ${message.type === 'success'
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                            : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+                        }`}>
+                        <Info size={20} />
+                        <span>{message.text}</span>
+                    </div>
+                )}
 
-            <form onSubmit={handleBulkSave} className="settings-container">
-                <div className="settings-grid">
-                    {/* General Settings */}
-                    <section className="settings-card">
-                        <div className="card-header">
-                            <Globe size={20} className="text-indigo" />
-                            <h3>General Configuration</h3>
+                <form onSubmit={handleBulkSave} className="flex flex-col gap-6">
+                    {/* General Configuration Section */}
+                    <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                            <span className="material-symbols-outlined text-primary text-xl">language</span>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">General Configuration</h3>
+                            </div>
                         </div>
-                        <div className="card-body">
-                            <div className="form-group">
-                                <label>Site Name</label>
+                        <div className="p-6 flex flex-col gap-6">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Site Name</label>
                                 <input
+                                    className="rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary/20 text-sm py-2.5 outline-none transition-all px-4 w-full"
                                     type="text"
                                     value={settings.site_name}
                                     onChange={(e) => setSettings({ ...settings, site_name: e.target.value })}
                                 />
                             </div>
-                            <div className="form-group">
-                                <label>Primary Contact Email</label>
-                                <div className="input-with-icon">
-                                    <Mail size={16} />
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Primary Contact Email</label>
+                                <div className="relative">
+                                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">mail</span>
                                     <input
+                                        className="rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary/20 text-sm py-2.5 outline-none transition-all pl-10 pr-4 w-full"
                                         type="email"
                                         value={settings.contact_email}
                                         onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
@@ -135,228 +123,97 @@ const Settings = () => {
                         </div>
                     </section>
 
-                    {/* Security & Access */}
-                    <section className="settings-card">
-                        <div className="card-header">
-                            <Shield size={20} className="text-indigo" />
-                            <h3>Security & Access</h3>
-                        </div>
-                        <div className="card-body">
-                            <div className="toggle-group">
-                                <div className="toggle-info">
-                                    <p className="toggle-label">Maintenance Mode</p>
-                                    <p className="toggle-hint">Hides the frontend website from the public.</p>
-                                </div>
-                                <label className="switch">
-                                    <input
-                                        type="checkbox"
-                                        checked={settings.maintenance_mode}
-                                        onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })}
-                                    />
-                                    <span className="slider round"></span>
-                                </label>
-                            </div>
-                            <div className="toggle-group mt-4">
-                                <div className="toggle-info">
-                                    <p className="toggle-label">Accept Applications</p>
-                                    <p className="toggle-hint">Enable or disable the career application forms.</p>
-                                </div>
-                                <label className="switch">
-                                    <input
-                                        type="checkbox"
-                                        checked={settings.enable_applications}
-                                        onChange={(e) => setSettings({ ...settings, enable_applications: e.target.checked })}
-                                    />
-                                    <span className="slider round"></span>
-                                </label>
+                    {/* System Notifications Section */}
+                    <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                            <span className="material-symbols-outlined text-primary text-xl">notifications</span>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">System Notifications</h3>
                             </div>
                         </div>
-                    </section>
-
-                    {/* Notifications */}
-                    <section className="settings-card">
-                        <div className="card-header">
-                            <Bell size={20} className="text-indigo" />
-                            <h3>System Notifications</h3>
-                        </div>
-                        <div className="card-body">
-                            <div className="form-group">
-                                <label>Admin Notification Email</label>
+                        <div className="p-6 flex flex-col gap-6">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Admin Notification Email</label>
                                 <input
+                                    className="rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary/20 text-sm py-2.5 outline-none transition-all px-4 w-full"
                                     type="email"
                                     value={settings.notification_email}
                                     onChange={(e) => setSettings({ ...settings, notification_email: e.target.value })}
                                 />
-                                <p className="helper-text">Where system alerts and new application alerts are sent.</p>
+                                <p className="text-xs text-slate-500 mt-1">Where system alerts and new application alerts are sent.</p>
                             </div>
                         </div>
                     </section>
-                </div>
 
-                <div className="settings-footer">
-                    <button type="submit" disabled={saving} className="btn-save-large">
-                        <Save size={20} />
-                        <span>{saving ? 'Applying Changes...' : 'Save All Changes'}</span>
-                    </button>
-                </div>
-            </form>
+                    {/* Security & Access Section */}
+                    <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                            <span className="material-symbols-outlined text-primary text-xl">security</span>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Security & Access Controls</h3>
+                                <p className="text-sm text-slate-500 mt-0.5">Manage visibility and core access features</p>
+                            </div>
+                        </div>
+                        <div className="p-6 flex flex-col gap-6">
 
-            <style>{`
-                .admin-page { padding: 2.5rem; background: #f8fafc; min-height: 100vh; }
-                .settings-container { max-width: 1000px; margin: 0 auto; }
-                
-                .settings-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-                    gap: 2rem;
-                    margin-bottom: 3rem;
-                }
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors hover:border-primary/30">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-lg hidden sm:block">
+                                        <span className="material-symbols-outlined">construction</span>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Maintenance Mode</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">Hides the frontend website from the public visitors.</p>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={settings.maintenance_mode}
+                                        onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 border border-slate-300 dark:border-slate-600"></div>
+                                </label>
+                            </div>
 
-                .settings-card {
-                    background: white;
-                    border-radius: 20px;
-                    border: 1px solid #e2e8f0;
-                    overflow: hidden;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-                }
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors hover:border-primary/30">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 bg-primary/10 text-primary rounded-lg hidden sm:block">
+                                        <span className="material-symbols-outlined">how_to_reg</span>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Accept Applications</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">Enable or disable the career application forms actively taking entries.</p>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={settings.enable_applications}
+                                        onChange={(e) => setSettings({ ...settings, enable_applications: e.target.checked })}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 border border-slate-300 dark:border-slate-600"></div>
+                                </label>
+                            </div>
 
-                .card-header {
-                    padding: 1.5rem 2rem;
-                    background: #fcfcfd;
-                    border-bottom: 1px solid #f1f5f9;
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                }
+                        </div>
+                    </section>
 
-                .card-header h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+                    <div className="flex justify-end gap-3 pb-12 pt-4">
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="px-8 py-3 bg-primary text-white text-sm font-bold rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center gap-2"
+                        >
+                            <span className="material-symbols-outlined text-xl">{saving ? 'sync' : 'save'}</span>
+                            {saving ? 'Applying...' : 'Save All Changes'}
+                        </button>
+                    </div>
 
-                .card-body { padding: 2rem; }
-
-                .status-banner {
-                    max-width: 1000px;
-                    margin: 0 auto 2rem;
-                    padding: 1rem 1.5rem;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    font-weight: 500;
-                }
-                .status-banner.success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-                .status-banner.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-
-                .form-group { margin-bottom: 1.5rem; }
-                .form-group label {
-                    display: block;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    color: #475569;
-                    margin-bottom: 0.5rem;
-                }
-                .form-group input {
-                    width: 100%;
-                    padding: 0.75rem 1rem;
-                    border: 1.5px solid #e2e8f0;
-                    border-radius: 12px;
-                    background: #f8fafc;
-                    transition: all 0.2s;
-                }
-                .form-group input:focus {
-                    outline: none;
-                    border-color: #6366f1;
-                    background: white;
-                }
-
-                .input-with-icon { position: relative; }
-                .input-with-icon svg {
-                    position: absolute;
-                    left: 1rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #94a3b8;
-                }
-                .input-with-icon input { padding-left: 2.75rem; }
-
-                .toggle-group {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 0.5rem 0;
-                }
-                .toggle-label { font-weight: 600; color: #1e293b; margin-bottom: 0.15rem; }
-                .toggle-hint { font-size: 0.8rem; color: #64748b; }
-
-                .switch {
-                    position: relative;
-                    display: inline-block;
-                    width: 50px;
-                    height: 26px;
-                }
-                .switch input { opacity: 0; width: 0; height: 0; }
-                .slider {
-                    position: absolute;
-                    cursor: pointer;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background-color: #e2e8f0;
-                    transition: .4s;
-                }
-                .slider:before {
-                    position: absolute;
-                    content: "";
-                    height: 18px; width: 18px;
-                    left: 4px; bottom: 4px;
-                    background-color: white;
-                    transition: .4s;
-                }
-                input:checked + .slider { background-color: #6366f1; }
-                input:checked + .slider:before { transform: translateX(24px); }
-                .slider.round { border-radius: 34px; }
-                .slider.round:before { border-radius: 50%; }
-
-                .settings-footer {
-                    display: flex;
-                    justify-content: center;
-                    padding-bottom: 4rem;
-                }
-
-                .btn-save-large {
-                    background: #6366f1;
-                    color: white;
-                    padding: 1rem 3rem;
-                    border-radius: 16px;
-                    font-weight: 700;
-                    font-size: 1rem;
-                    border: none;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                    transition: all 0.3s;
-                    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-                }
-                .btn-save-large:hover {
-                    background: #4f46e5;
-                    transform: translateY(-2px);
-                    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
-                }
-                .btn-save-large:disabled { opacity: 0.7; transform: none; cursor: not-allowed; }
-
-                .btn-icon-secondary {
-                    background: white;
-                    border: 1px solid #e2e8f0;
-                    padding: 0.6rem;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    color: #64748b;
-                    transition: all 0.2s;
-                }
-                .btn-icon-secondary:hover { background: #f8fafc; color: #0f172a; }
-
-                .helper-text { font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem; }
-                .mt-4 { margin-top: 1rem; }
-                .text-indigo { color: #6366f1; }
-            `}</style>
+                </form>
+            </div>
         </div>
     );
 };

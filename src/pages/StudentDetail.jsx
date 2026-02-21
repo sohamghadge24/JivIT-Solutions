@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import PremiumDetail from '../components/PremiumDetail';
 import { adminService } from '../lib/adminService';
 
 const StudentDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [program, setProgram] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -42,10 +43,10 @@ const StudentDetail = () => {
             subtitle={program.subtitle}
             description={program.description}
             ctaText="Apply Now"
-            ctaAction={() => window.location.href = `mailto:students@jivitsolutions.com?subject=Application for ${program.title}`}
-            imagePrimary={program.image_url}
+            ctaAction={() => navigate(`/students/${id}/apply`)}
+            imagePrimary={program.image_url || "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"}
             // Use same image or a fallback/secondary one if available for the cutout
-            imageSecondary={program.image_url}
+            imageSecondary={program.image_url || "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80"}
         />
     );
 };
